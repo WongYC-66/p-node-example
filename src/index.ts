@@ -18,35 +18,66 @@ DatabaseManager.connect('default', {
   dbName: 'my-database',
   adapter: 'leveldb',
   auth: {
-      username: 'admin',
-      password: 'password'
+    username: 'admin',
+    password: 'password'
   },
 });
-
 
 // set the view engine to ejs
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 // Home 
-app.get('/', async(req: Request, res: Response) => {
+app.get('/', async (req: Request, res: Response) => {
   const allRecipes = await Recipe.all()
-  console.log(allRecipes)
-  res.render("home", {allRecipes});
+  const allRecipeItems = await RecipeItem.all()
+  res.render("home", { allRecipes, allRecipeItems });
 });
 
 // Create New Recipe
 app.get('/newRecipe', async (req: Request, res: Response) => {
-  
-  const newRecipe = new Recipe({
-    name: faker.food.dish(),                          // name 
-    description: faker.food.description(),            // description
-    popularity: faker.number.int({ min: 1, max: 5 }), // popularity
+
+  // random recipe from fakerJS
+  let newRecipe = new Recipe({
+    name: faker.food.dish(),
+    description: faker.food.description(),
+    popularity: faker.number.int({ min: 1, max: 5 }),
+    ingredients: [],
   });
 
+  // random ingredients of quantity 2~4
+  const ingredientCount = Math.floor(Math.random() * 4) + 1
+
+  for (let i = 0; i < ingredientCount; i++) {
+    // const newRecipeItem = new RecipeItem({
+    const newRecipeItem = {
+      name: faker.food.ingredient(),
+      quantity: faker.number.int({ min: 1, max: 5 }),
+      unit: "unit",
+    }
+    // await newRecipeItem.save()
+    newRecipe.ingredients.push(newRecipeItem)
+  }
+
   console.log(newRecipe)
-  await newRecipe.save()
-  res.render('home');
+  await newRecipe.save()  // save
+
+  res.redirect('/');
+
+});
+
+// Delete last recipe
+app.get('/deleteLastRecipe', async (req: Request, res: Response) => {
+
+  let allRecipes = await Recipe.all()
+
+  const lastRecipe = allRecipes.at(-1)
+
+  if (lastRecipe) {
+    await lastRecipe.delete(true)   // hard delete with(true)
+  }
+
+  res.redirect('/');
 });
 
 app.listen(port, () => {

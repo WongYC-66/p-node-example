@@ -7,7 +7,6 @@ export class RecipeItem extends Model {
     name!: string;
     quantity!: number;
     unit!: string;
-
 }
 
 export class Recipe extends Model {
@@ -17,4 +16,6 @@ export class Recipe extends Model {
     name!: string;
     description!: string;
     popularity!: number;
+
+    ingredients!: any[];
 }

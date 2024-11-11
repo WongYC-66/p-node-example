@@ -1,6 +1,30 @@
 <h1>Home</h1>
 
-<% allRecipes.forEach(recipe => { %>
-    <%= recipe.name %>
-    <br>
-<% }) %>
+<!-- Add button -->
+<form method="get" action="/newRecipe">
+  <button>Add new recipe</button>
+</form>
+
+<!-- Delete button -->
+<form method="get" action="/deleteLastRecipe">
+  <button>Delete last recipe</button>
+</form>
+
+<!-- Display recipes -->
+<div>
+  <% allRecipes.forEach(recipe => { %>
+  <p><%= recipe.name %></p>
+  <%- include('ingredients', { ingredients: recipe.ingredients }) %>
+  <hr />
+  <% }) %>
+</div>
+
+<!-- Display recipe_items -->
+<div>
+  <% allRecipeItems.forEach(item => { %>
+  <p><%= item.name %></p>
+  <hr />
+  <% }) %>
+</div>
+
+<%# console.log(allRecipes) %>
