@@ -10,6 +10,7 @@
   <button>Delete last recipe</button>
 </form>
 
+<h1>All recipes</h1>
 <!-- Display recipes -->
 <div>
   <% allRecipes.forEach(recipe => { %>
@@ -19,6 +20,9 @@
   <% }) %>
 </div>
 
+<hr>
+
+<h1>All recipeItems</h1>
 <!-- Display recipe_items -->
 <div>
   <% allRecipeItems.forEach(item => { %>
@@ -27,4 +31,4 @@
   <% }) %>
 </div>
 
-<%# console.log(allRecipes) %>
+<% console.log(allRecipes) %>

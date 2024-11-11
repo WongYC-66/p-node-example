@@ -1,7 +1,11 @@
 <div>
   <ul>
-    <%# ingredients.forEach(ingredient => { %>
-        <!-- <li><%#= ingredients %></li> -->
-    <%# }) %>
+    <% if(ingredients){ %>
+      <% ingredients.forEach(ingredient => { %>
+          <li><%= ingredient.name %></li>
+          <li><%= ingredient.quantity %></li>
+          <li><%= ingredient.unit %></li>
+      <% }) %>
+    <% } %>
   </ul>
 </div>

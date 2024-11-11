@@ -1,5 +1,6 @@
-import { Model } from 'pocketto';
+import { Model, Relational, HasMany, BelongsTo, BelongsToMany, HasOne } from 'pocketto';
 
+@Relational
 export class RecipeItem extends Model {
     static dbName = 'my-database';
     static collectionName = 'RecipeItems';
@@ -7,15 +8,21 @@ export class RecipeItem extends Model {
     name!: string;
     quantity!: number;
     unit!: string;
+    
+    @HasOne("Recipe")
+    recipe!: Recipe;
 }
 
+@Relational
 export class Recipe extends Model {
+    
     static dbName = 'my-database';
     static collectionName = 'Recipes';
-
+    
     name!: string;
     description!: string;
     popularity!: number;
-
-    ingredients!: any[];
+    
+    @HasMany("RecipeItem")
+    ingredients!: RecipeItem[];
 }

@@ -29,37 +29,52 @@ app.set('view engine', 'ejs');
 
 // Home 
 app.get('/', async (req: Request, res: Response) => {
-  const allRecipes = await Recipe.all()
+  const allRecipes = await Recipe.query().with('ingredients').get()
+  // const allRecipes = await Recipe.relationship().ingredients().all()
+
   const allRecipeItems = await RecipeItem.all()
   res.render("home", { allRecipes, allRecipeItems });
+});
+
+// get random1
+app.get('/1', async (req: Request, res: Response) => {
+  const allRecipes = await Recipe.query().with('ingredients').get()
+  const randomRecipe = allRecipes.sort(_ => Math.random() - 0.5).pop()
+  res.json(randomRecipe);
 });
 
 // Create New Recipe
 app.get('/newRecipe', async (req: Request, res: Response) => {
 
   // random recipe from fakerJS
-  let newRecipe = new Recipe({
+  const newRecipe: Recipe = new Recipe({
     name: faker.food.dish(),
     description: faker.food.description(),
     popularity: faker.number.int({ min: 1, max: 5 }),
-    ingredients: [],
+    ingredients: generateRandomRecipeItems(),
   });
 
-  // random ingredients of quantity 2~4
-  const ingredientCount = Math.floor(Math.random() * 4) + 1
+  function generateRandomRecipeItems(): RecipeItem[] {
+    // random ingredients of quantity 2~4
+    const ingredientCount = Math.floor(Math.random() * 4) + 1
+    const returnArr: RecipeItem[] = []
 
-  for (let i = 0; i < ingredientCount; i++) {
-    // const newRecipeItem = new RecipeItem({
-    const newRecipeItem = {
-      name: faker.food.ingredient(),
-      quantity: faker.number.int({ min: 1, max: 5 }),
-      unit: "unit",
+    for (let i = 0; i < ingredientCount; i++) {
+      const newRecipeItem = new RecipeItem({
+        name: faker.food.ingredient(),
+        quantity: faker.number.int({ min: 1, max: 5 }),
+        unit: "unit",
+      })
+      returnArr.push(newRecipeItem)
     }
-    // await newRecipeItem.save()
-    newRecipe.ingredients.push(newRecipeItem)
+    return returnArr
   }
 
+  if(newRecipe.ingredients.length == 0){
+    throw("Error: ingredients emtpy")
+  }
   console.log(newRecipe)
+
   await newRecipe.save()  // save
 
   res.redirect('/');
