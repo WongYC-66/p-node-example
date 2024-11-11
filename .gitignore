@@ -1,5 +1,8 @@
+# folders
 node_modules/
-
 dist/
+default/
 
+# files
 .env
+
