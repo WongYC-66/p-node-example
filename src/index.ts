@@ -29,11 +29,15 @@ app.set('view engine', 'ejs');
 
 // Home 
 app.get('/', async (req: Request, res: Response) => {
-  const allRecipes = await Recipe.query().with('ingredients').get()
-  // const allRecipes = await Recipe.relationship().ingredients().all()
+  const allRecipes = await Recipe.with('ingredients').get()
 
-  const allRecipeItems = await RecipeItem.all()
-  res.render("home", { allRecipes, allRecipeItems });
+  // let firstRecipe = await Recipe.query().first()
+  // await firstRecipe!.load("ingredients")
+  // const allRecipes = [firstRecipe]
+
+  // const allRecipeItems = await RecipeItem.all()
+
+  res.render("home", { allRecipes });
 });
 
 // get random1
@@ -70,10 +74,9 @@ app.get('/newRecipe', async (req: Request, res: Response) => {
     return returnArr
   }
 
-  if(newRecipe.ingredients.length == 0){
-    throw("Error: ingredients emtpy")
+  if (newRecipe.ingredients.length == 0) {
+    throw ("Error: ingredients emtpy")
   }
-  console.log(newRecipe)
 
   await newRecipe.save()  // save
 
@@ -93,6 +96,51 @@ app.get('/deleteLastRecipe', async (req: Request, res: Response) => {
   }
 
   res.redirect('/');
+});
+
+// load testing
+// usage : http://localhost:3000/generate/100
+app.get('/generate/:count', async (req: Request, res: Response) => {
+
+  let count = Number(req.params.count) || 1
+  for (let i = 0; i < count; i++) {
+    console.log({i})
+
+    // random recipe from fakerJS
+    const newRecipe: Recipe = new Recipe({
+      name: faker.food.dish(),
+      description: faker.food.description(),
+      popularity: faker.number.int({ min: 1, max: 5 }),
+      ingredients: generateRandomRecipeItems(),
+    });
+
+    function generateRandomRecipeItems(): RecipeItem[] {
+      // random ingredients of quantity 2~4
+      const ingredientCount = Math.floor(Math.random() * 4) + 1
+      const returnArr: RecipeItem[] = []
+
+      for (let i = 0; i < ingredientCount; i++) {
+        const newRecipeItem = new RecipeItem({
+          name: faker.food.ingredient(),
+          quantity: faker.number.int({ min: 1, max: 5 }),
+          unit: "unit",
+        })
+        returnArr.push(newRecipeItem)
+      }
+      return returnArr
+    }
+
+    if (newRecipe.ingredients.length == 0) {
+      throw ("Error: ingredients emtpy")
+    }
+
+    await newRecipe.save()  // save
+    console.log("saved")
+
+  }
+
+  res.redirect('/');
+
 });
 
 app.listen(port, () => {
